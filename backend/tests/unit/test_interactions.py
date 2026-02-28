@@ -31,3 +31,22 @@ def test_filter_excludes_interaction_with_different_learner_id() -> None:
     result = _filter_by_item_id(interactions, 1)
     assert len(result) == 1
     assert result[0].id == 1
+
+
+def test_filter_returns_multiple_interactions_for_same_item_id() -> None:
+    """Multiple interactions can reference the same item_id; filter returns all of them."""
+    interactions = [
+        _make_log(1, 1, 10),
+        _make_log(2, 2, 10),
+        _make_log(3, 1, 20),
+    ]
+    result = _filter_by_item_id(interactions, 10)
+    assert len(result) == 2
+    assert {r.id for r in result} == {1, 2}
+
+
+def test_filter_returns_empty_when_no_item_id_match() -> None:
+    """Filtering by item_id that does not appear in the list returns empty."""
+    interactions = [_make_log(1, 1, 1), _make_log(2, 2, 2)]
+    result = _filter_by_item_id(interactions, 99)
+    assert result == []
